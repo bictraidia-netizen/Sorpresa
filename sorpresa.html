@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Felices 22 añitos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root{
+    --wine:#5c1a2b;
+    --wine-deep:#3a0f1c;
+    --gold:#c9a24b;
+    --cream:#f6ecd9;
+    --ink:#2a1014;
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:inherit}
+  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  html,body{height:100%;margin:0;}
+  body{
+    min-height:100%;
+    background:
+      radial-gradient(circle at 20% 10%, rgba(201,162,75,0.18), transparent 45%),
+      radial-gradient(circle at 85% 90%, rgba(201,162,75,0.12), transparent 40%),
+      linear-gradient(180deg, var(--wine-deep), var(--wine));
+    color:var(--cream);
+    font-family:'Jost', sans-serif;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:32px 18px;
+  }
+  .card{
+    width:100%;
+    max-width:480px;
+    text-align:center;
+  }
+  h1{
+    font-family:'Cormorant Garamond', serif;
+    font-weight:600;
+    font-size:clamp(2rem, 7vw, 2.7rem);
+    letter-spacing:0.02em;
+    margin:0 0 6px;
+    line-height:1.15;
+    color:var(--cream);
+  }
+  .sub{
+    font-size:0.95rem;
+    color:var(--gold);
+    margin:0 0 28px;
+    font-style:italic;
+    font-family:'Cormorant Garamond', serif;
+    font-size:1.15rem;
+  }
+  .panel{
+    background:rgba(246,236,217,0.05);
+    border:1px solid rgba(201,162,75,0.35);
+    border-radius:4px;
+    padding:28px 22px;
+  }
+  .qr-wrap{
+    display:flex;
+    justify-content:center;
+    margin-bottom:22px;
+  }
+  #qrcode{
+    background:var(--cream);
+    padding:10px;
+    border-radius:3px;
+    line-height:0;
+  }
+  .hint-note{
+    font-size:0.82rem;
+    color:rgba(246,236,217,0.65);
+    margin:0 0 18px;
+  }
+  input[type="password"], input[type="text"]{
+    width:100%;
+    background:rgba(0,0,0,0.2);
+    border:1px solid rgba(201,162,75,0.5);
+    color:var(--cream);
+    font-family:'Jost', sans-serif;
+    font-size:1rem;
+    padding:12px 14px;
+    border-radius:3px;
+    outline:none;
+    margin-bottom:12px;
+  }
+  input::placeholder{color:rgba(246,236,217,0.4);}
+  input:focus{border-color:var(--gold);}
+  button{
+    width:100%;
+    background:var(--gold);
+    color:var(--wine-deep);
+    border:none;
+    font-family:'Jost', sans-serif;
+    font-weight:600;
+    font-size:0.95rem;
+    letter-spacing:0.02em;
+    padding:12px 14px;
+    border-radius:3px;
+    cursor:pointer;
+    transition:transform 0.15s ease, background 0.15s ease;
+  }
+  button:hover{background:#dab868;}
+  button:active{transform:scale(0.98);}
+  .link-btn{
+    background:none;
+    color:var(--gold);
+    text-decoration:underline;
+    font-size:0.85rem;
+    padding:6px;
+    margin-top:2px;
+    width:auto;
+  }
+  .link-btn:hover{background:none;color:#dab868;}
+  #hint-text{
+    display:none;
+    font-size:0.85rem;
+    color:var(--cream);
+    margin-top:6px;
+    font-style:italic;
+  }
+  #error-msg{
+    display:none;
+    color:#e5a1a1;
+    font-size:0.85rem;
+    margin:-4px 0 12px;
+  }
+  .countdown{
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    margin:6px 0 26px;
+  }
+  .cd-unit{min-width:56px;}
+  .cd-num{
+    font-family:'Cormorant Garamond', serif;
+    font-size:2.1rem;
+    font-weight:600;
+    color:var(--gold);
+    line-height:1;
+  }
+  .cd-label{
+    font-size:0.68rem;
+    letter-spacing:0.05em;
+    color:rgba(246,236,217,0.6);
+    margin-top:4px;
+  }
+  .morse-box{
+    background:rgba(0,0,0,0.25);
+    border:1px dashed rgba(201,162,75,0.5);
+    border-radius:3px;
+    padding:16px 14px;
+    font-family:'Jost', sans-serif;
+    letter-spacing:0.12em;
+    font-size:1.05rem;
+    word-break:break-all;
+    line-height:1.7;
+    color:var(--gold);
+    margin-bottom:16px;
+    min-height:56px;
+  }
+  .morse-solved{
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    font-size:1.25rem;
+    letter-spacing:normal;
+    color:var(--cream);
+  }
+  .section-label{
+    font-size:0.75rem;
+    letter-spacing:0.05em;
+    color:rgba(246,236,217,0.55);
+    margin:0 0 8px;
+    text-align:left;
+  }
+  .reveal{
+    animation:fadeUp 0.6s ease both;
+  }
+  @keyframes fadeUp{
+    from{opacity:0; transform:translateY(8px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  .coords{
+    font-family:'Cormorant Garamond', serif;
+    font-size:1.3rem;
+    color:var(--cream);
+    margin:10px 0 18px;
+    line-height:1.4;
+  }
+  .maps-link{
+    display:inline-block;
+    color:var(--wine-deep);
+    background:var(--gold);
+    text-decoration:none;
+    padding:12px 20px;
+    border-radius:3px;
+    font-weight:600;
+    font-size:0.9rem;
+  }
+  .maps-link:hover{background:#dab868;}
+  .hidden{display:none !important;}
+  @media (prefers-reduced-motion: reduce){
+    .reveal{animation:none;}
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Felices 22 añitos<br>mi amor</h1>
+  <p class="sub">un pequeño secreto para ti</p>
+
+  <div class="panel">
+
+    <!-- QR de esta misma página, para poder compartirla -->
+    <div class="qr-wrap"><div id="qrcode"></div></div>
+
+    <!-- PASO 1: contraseña -->
+    <div id="lock-screen">
+      <p class="section-label">Escanea, y dime la contraseña</p>
+      <input type="password" id="pw-input" placeholder="Contraseña" autocomplete="off">
+      <p id="error-msg">Esa no es. Inténtalo de nuevo.</p>
+      <button id="pw-submit">Entrar</button>
+      <button class="link-btn" id="hint-btn" type="button">¿Una pista?</button>
+      <p id="hint-text">Que quiero que sea su niño'</p>
+    </div>
+
+    <!-- PASO 2: contador + morse -->
+    <div id="main-screen" class="hidden">
+      <div class="countdown">
+        <div class="cd-unit"><div class="cd-num" id="cd-days">00</div><div class="cd-label">días</div></div>
+        <div class="cd-unit"><div class="cd-num" id="cd-hours">00</div><div class="cd-label">horas</div></div>
+        <div class="cd-unit"><div class="cd-num" id="cd-mins">00</div><div class="cd-label">min</div></div>
+        <div class="cd-unit"><div class="cd-num" id="cd-secs">00</div><div class="cd-label">seg</div></div>
+      </div>
+
+      <div id="morse-section">
+        <p class="section-label">Esto no se lee hasta que sea la hora... a menos que lo adivines</p>
+        <div class="morse-box" id="morse-display"></div>
+        <input type="text" id="guess-input" placeholder="Escribe aquí lo que crees que dice">
+        <button id="guess-submit" type="button">Comprobar</button>
+      </div>
+
+      <!-- PASO 3: se muestra al llegar la hora -->
+      <div id="reveal-section" class="hidden reveal">
+        <p class="section-label">Ha llegado la hora. Nos vemos aquí:</p>
+        <p class="coords">Paraje La Torre<br>Ctra. Cuenca–Tragacete, km 12<br>16143, Cuenca</p>
+        <a class="maps-link" id="maps-link" href="#" target="_blank" rel="noopener">Abrir en Google Maps</a>
+      </div>
+    </div>
+
+  </div>
+
+  <button class="link-btn" id="reset-btn" type="button" style="margin-top:18px; font-size:0.72rem; opacity:0.55;">reiniciar</button>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var PASSWORD = "tengan mi sangre";
+  var TARGET = new Date("2026-10-02T16:00:00+02:00");
+  var SECRET_MESSAGE = "Hasta el dia 2 de octubre no se descubrira";
+
+  function norm(s){
+    return s.toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+      .replace(/[^a-z0-9 ]/g,"")
+      .trim()
+      .replace(/\s+/g," ");
+  }
+
+  var MORSE = {
+    a:".-", b:"-...", c:"-.-.", d:"-..", e:".", f:"..-.", g:"--.",
+    h:"....", i:"..", j:".---", k:"-.-", l:".-..", m:"--", n:"-.",
+    o:"---", p:".--.", q:"--.-", r:".-.", s:"...", t:"-", u:"..-",
+    v:"...-", w:".--", x:"-..-", y:"-.--", z:"--..",
+    "0":"-----","1":".----","2":"..---","3":"...--","4":"....-",
+    "5":".....","6":"-....","7":"--...","8":"---..","9":"----."
+  };
+  function toMorse(text){
+    return norm(text).split(" ").map(function(word){
+      return word.split("").map(function(ch){ return MORSE[ch] || ""; }).join(" ");
+    }).join("  /  ");
+  }
+
+  // --- QR de esta misma página ---
+  try{
+    new QRCode(document.getElementById("qrcode"), {
+      text: window.location.href,
+      width: 148,
+      height: 148,
+      colorDark: "#3a0f1c",
+      colorLight: "#f6ecd9"
+    });
+  }catch(e){}
+
+  var unlocked = false;
+  var guessed = false;
+  try{
+    unlocked = localStorage.getItem("sorpresa_unlocked") === "1";
+    guessed = localStorage.getItem("sorpresa_guessed") === "1";
+  }catch(e){}
+
+  var lockScreen = document.getElementById("lock-screen");
+  var mainScreen = document.getElementById("main-screen");
+  var morseDisplay = document.getElementById("morse-display");
+  var morseSection = document.getElementById("morse-section");
+  var revealSection = document.getElementById("reveal-section");
+
+  function showMain(){
+    lockScreen.classList.add("hidden");
+    mainScreen.classList.remove("hidden");
+    if (guessed){
+      morseDisplay.textContent = SECRET_MESSAGE;
+      morseDisplay.classList.add("morse-solved");
+      document.getElementById("guess-input").value = "";
+      document.getElementById("guess-input").placeholder = "Ya lo has adivinado ✓";
+      document.getElementById("guess-input").disabled = true;
+      document.getElementById("guess-submit").disabled = true;
+    } else {
+      morseDisplay.textContent = toMorse(SECRET_MESSAGE);
+    }
+  }
+
+  document.getElementById("hint-btn").addEventListener("click", function(){
+    document.getElementById("hint-text").style.display = "block";
+  });
+
+  document.getElementById("pw-submit").addEventListener("click", tryPassword);
+  document.getElementById("pw-input").addEventListener("keydown", function(e){
+    if (e.key === "Enter") tryPassword();
+  });
+  function tryPassword(){
+    var val = norm(document.getElementById("pw-input").value);
+    if (val === norm(PASSWORD)){
+      try{ localStorage.setItem("sorpresa_unlocked","1"); }catch(e){}
+      showMain();
+      startCountdown();
+    } else {
+      document.getElementById("error-msg").style.display = "block";
+    }
+  }
+
+  document.getElementById("guess-submit").addEventListener("click", tryGuess);
+  document.getElementById("guess-input").addEventListener("keydown", function(e){
+    if (e.key === "Enter") tryGuess();
+  });
+  function tryGuess(){
+    var val = norm(document.getElementById("guess-input").value);
+    if (val === norm(SECRET_MESSAGE)){
+      guessed = true;
+      try{ localStorage.setItem("sorpresa_guessed","1"); }catch(e){}
+      morseDisplay.textContent = SECRET_MESSAGE;
+      morseDisplay.classList.add("morse-solved");
+      document.getElementById("guess-input").disabled = true;
+      document.getElementById("guess-submit").disabled = true;
+      document.getElementById("guess-input").placeholder = "¡Correcto! ✓";
+    }
+  }
+
+  function pad(n){ return String(n).padStart(2,"0"); }
+
+  function startCountdown(){
+    function tick(){
+      var now = new Date();
+      var diff = TARGET - now;
+      if (diff <= 0){
+        document.getElementById("cd-days").textContent = "00";
+        document.getElementById("cd-hours").textContent = "00";
+        document.getElementById("cd-mins").textContent = "00";
+        document.getElementById("cd-secs").textContent = "00";
+        revealMoment();
+        clearInterval(timer);
+        return;
+      }
+      var d = Math.floor(diff/86400000);
+      var h = Math.floor((diff%86400000)/3600000);
+      var m = Math.floor((diff%3600000)/60000);
+      var s = Math.floor((diff%60000)/1000);
+      document.getElementById("cd-days").textContent = pad(d);
+      document.getElementById("cd-hours").textContent = pad(h);
+      document.getElementById("cd-mins").textContent = pad(m);
+      document.getElementById("cd-secs").textContent = pad(s);
+    }
+    tick();
+    var timer = setInterval(tick, 1000);
+  }
+
+  function revealMoment(){
+    morseSection.classList.add("hidden");
+    revealSection.classList.remove("hidden");
+    var q = encodeURIComponent("Paraje La Torre, Ctra. Cuenca-Tragacete km 12, 16143 Cuenca");
+    document.getElementById("maps-link").href = "https://www.google.com/maps/search/?api=1&query=" + q;
+  }
+
+  if (unlocked){
+    showMain();
+    startCountdown();
+  }
+
+  document.getElementById("reset-btn").addEventListener("click", function(){
+    try{
+      localStorage.removeItem("sorpresa_unlocked");
+      localStorage.removeItem("sorpresa_guessed");
+    }catch(e){}
+    location.reload();
+  });
+})();
+</script>
+</body>
+</html>
