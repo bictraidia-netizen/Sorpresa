@@ -7,7 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
   :root{
     --wine:#5c1a2b;
@@ -63,17 +62,6 @@
     border-radius:4px;
     padding:28px 22px;
   }
-  .qr-wrap{
-    display:flex;
-    justify-content:center;
-    margin-bottom:22px;
-  }
-  #qrcode{
-    background:var(--cream);
-    padding:10px;
-    border-radius:3px;
-    line-height:0;
-  }
   .hint-note{
     font-size:0.82rem;
     color:rgba(246,236,217,0.65);
@@ -91,6 +79,28 @@
     outline:none;
     margin-bottom:12px;
   }
+  .pw-wrap{
+    position:relative;
+  }
+  .pw-wrap input{
+    padding-right:44px;
+  }
+  #pw-toggle{
+    position:absolute;
+    right:6px;
+    top:50%;
+    transform:translateY(-50%);
+    width:auto;
+    background:none;
+    border:none;
+    font-size:1.05rem;
+    padding:6px 8px;
+    line-height:1;
+    opacity:0.65;
+    cursor:pointer;
+    margin-bottom:0;
+  }
+  #pw-toggle:hover{background:none; opacity:1;}
   input::placeholder{color:rgba(246,236,217,0.4);}
   input:focus{border-color:var(--gold);}
   button{
@@ -206,25 +216,52 @@
   }
   .maps-link:hover{background:#dab868;}
   .hidden{display:none !important;}
+  .heart-layer{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    overflow:hidden;
+    z-index:5;
+  }
+  .heart{
+    position:absolute;
+    bottom:-30px;
+    font-size:1.1rem;
+    color:var(--gold);
+    opacity:0.55;
+    animation:heartFloat linear forwards;
+  }
+  .heart.burst{
+    color:#e08a9b;
+    font-size:1.4rem;
+    opacity:0.9;
+  }
+  @keyframes heartFloat{
+    0%{ transform:translateY(0) translateX(0) scale(0.8) rotate(0deg); opacity:0; }
+    10%{ opacity:0.8; }
+    100%{ transform:translateY(-110vh) translateX(var(--drift, 0px)) scale(1.1) rotate(15deg); opacity:0; }
+  }
   @media (prefers-reduced-motion: reduce){
     .reveal{animation:none;}
+    .heart{display:none;}
   }
 </style>
 </head>
 <body>
+<div class="heart-layer" id="heart-layer"></div>
 <div class="card">
   <h1>Felices 22 añitos<br>mi amor</h1>
   <p class="sub">un pequeño secreto para ti</p>
 
   <div class="panel">
 
-    <!-- QR de esta misma página, para poder compartirla -->
-    <div class="qr-wrap"><div id="qrcode"></div></div>
-
     <!-- PASO 1: contraseña -->
     <div id="lock-screen">
       <p class="section-label">Escanea, y dime la contraseña</p>
-      <input type="password" id="pw-input" placeholder="Contraseña" autocomplete="off">
+      <div class="pw-wrap">
+        <input type="password" id="pw-input" placeholder="Contraseña" autocomplete="off">
+        <button type="button" id="pw-toggle" aria-label="Mostrar contraseña">👁</button>
+      </div>
       <p id="error-msg">Esa no es. Inténtalo de nuevo.</p>
       <button id="pw-submit">Entrar</button>
       <button class="link-btn" id="hint-btn" type="button">¿Una pista?</button>
@@ -268,6 +305,11 @@
   var TARGET = new Date("2026-10-02T16:00:00+02:00");
   var SECRET_MESSAGE = "Hasta el dia 2 de octubre no se descubrira";
 
+  var TEST_MODE = new URLSearchParams(window.location.search).get("test") === "1";
+  if (TEST_MODE){
+    TARGET = new Date(Date.now() + 5000);
+  }
+
   function norm(s){
     return s.toLowerCase()
       .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
@@ -289,17 +331,6 @@
       return word.split("").map(function(ch){ return MORSE[ch] || ""; }).join(" ");
     }).join("  /  ");
   }
-
-  // --- QR de esta misma página ---
-  try{
-    new QRCode(document.getElementById("qrcode"), {
-      text: window.location.href,
-      width: 148,
-      height: 148,
-      colorDark: "#3a0f1c",
-      colorLight: "#f6ecd9"
-    });
-  }catch(e){}
 
   var unlocked = false;
   var guessed = false;
@@ -333,6 +364,14 @@
     document.getElementById("hint-text").style.display = "block";
   });
 
+  document.getElementById("pw-toggle").addEventListener("click", function(){
+    var input = document.getElementById("pw-input");
+    var showing = input.type === "text";
+    input.type = showing ? "password" : "text";
+    this.textContent = showing ? "👁" : "🙈";
+    this.setAttribute("aria-label", showing ? "Mostrar contraseña" : "Ocultar contraseña");
+  });
+
   document.getElementById("pw-submit").addEventListener("click", tryPassword);
   document.getElementById("pw-input").addEventListener("keydown", function(e){
     if (e.key === "Enter") tryPassword();
@@ -341,6 +380,7 @@
     var val = norm(document.getElementById("pw-input").value);
     if (val === norm(PASSWORD)){
       try{ localStorage.setItem("sorpresa_unlocked","1"); }catch(e){}
+      heartBurst(14);
       showMain();
       startCountdown();
     } else {
@@ -357,6 +397,7 @@
     if (val === norm(SECRET_MESSAGE)){
       guessed = true;
       try{ localStorage.setItem("sorpresa_guessed","1"); }catch(e){}
+      heartBurst(14);
       morseDisplay.textContent = SECRET_MESSAGE;
       morseDisplay.classList.add("morse-solved");
       document.getElementById("guess-input").disabled = true;
@@ -364,6 +405,29 @@
       document.getElementById("guess-input").placeholder = "¡Correcto! ✓";
     }
   }
+
+  function spawnHeart(burst){
+    var layer = document.getElementById("heart-layer");
+    var h = document.createElement("span");
+    h.className = "heart" + (burst ? " burst" : "");
+    h.textContent = "♥";
+    h.style.left = (Math.random() * 100) + "vw";
+    h.style.setProperty("--drift", ((Math.random() * 80) - 40) + "px");
+    var duration = burst ? (2 + Math.random() * 1.2) : (5 + Math.random() * 4);
+    h.style.animationDuration = duration + "s";
+    layer.appendChild(h);
+    h.addEventListener("animationend", function(){ h.remove(); });
+  }
+
+  function heartBurst(count){
+    for (var i = 0; i < count; i++){
+      setTimeout(function(){ spawnHeart(true); }, i * 90);
+    }
+  }
+
+  // corazones ambientales, despacio, todo el rato
+  setInterval(function(){ spawnHeart(false); }, 1800);
+  spawnHeart(false);
 
   function pad(n){ return String(n).padStart(2,"0"); }
 
@@ -396,11 +460,12 @@
   function revealMoment(){
     morseSection.classList.add("hidden");
     revealSection.classList.remove("hidden");
+    heartBurst(20);
     var q = encodeURIComponent("Paraje La Torre, Ctra. Cuenca-Tragacete km 12, 16143 Cuenca");
     document.getElementById("maps-link").href = "https://www.google.com/maps/search/?api=1&query=" + q;
   }
 
-  if (unlocked){
+  if (unlocked || TEST_MODE){
     showMain();
     startCountdown();
   }
