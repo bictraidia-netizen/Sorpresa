@@ -216,6 +216,13 @@
   }
   .maps-link:hover{background:#dab868;}
   .hidden{display:none !important;}
+  #guess-feedback{
+    font-size:0.85rem;
+    margin:8px 0 0;
+    min-height:1.1em;
+  }
+  #guess-feedback.ok{ color:#8fd19e; }
+  #guess-feedback.no{ color:#e5a1a1; }
   .heart-layer{
     position:fixed;
     inset:0;
@@ -282,6 +289,7 @@
         <div class="morse-box" id="morse-display"></div>
         <input type="text" id="guess-input" placeholder="Escribe aquí lo que crees que dice">
         <button id="guess-submit" type="button">Comprobar</button>
+        <p id="guess-feedback"></p>
       </div>
 
       <!-- PASO 3: se muestra al llegar la hora -->
@@ -394,6 +402,7 @@
   });
   function tryGuess(){
     var val = norm(document.getElementById("guess-input").value);
+    var feedback = document.getElementById("guess-feedback");
     if (val === norm(SECRET_MESSAGE)){
       guessed = true;
       try{ localStorage.setItem("sorpresa_guessed","1"); }catch(e){}
@@ -403,6 +412,11 @@
       document.getElementById("guess-input").disabled = true;
       document.getElementById("guess-submit").disabled = true;
       document.getElementById("guess-input").placeholder = "¡Correcto! ✓";
+      feedback.textContent = "¡Lo has adivinado! 💛";
+      feedback.className = "ok";
+    } else {
+      feedback.textContent = "Todavía no... inténtalo de nuevo.";
+      feedback.className = "no";
     }
   }
 
